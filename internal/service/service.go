@@ -124,13 +124,15 @@ func unit(argv []string) string {
 		}
 		quoted[i] = a
 	}
+	// Restart=always lets a package upgrade terminate the running agent after
+	// replacing the binary. An explicit systemctl stop still suppresses restart.
 	return `[Unit]
 Description=certssh SSH agent
 Documentation=https://github.com/vexxhost/certssh
 
 [Service]
 ExecStart=` + strings.Join(quoted, " ") + `
-Restart=on-failure
+Restart=always
 
 [Install]
 WantedBy=default.target

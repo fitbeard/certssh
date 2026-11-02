@@ -24,7 +24,8 @@ func TestRender(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !strings.Contains(linux.Content, `ExecStart="/Users/a b/bin/certssh" -config /tmp/c&d.yaml agent`) {
+	if !strings.Contains(linux.Content, `ExecStart="/Users/a b/bin/certssh" -config /tmp/c&d.yaml agent`) ||
+		!strings.Contains(linux.Content, "Restart=always") {
 		t.Fatalf("unit:\n%s", linux.Content)
 	}
 	if linux.EnvContent != "SSH_AUTH_SOCK=/home/a/.certssh/agent.sock\n" || !linux.RecordUpstream("x") {

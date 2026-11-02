@@ -14,7 +14,15 @@ import (
 	"github.com/vexxhost/certssh/internal/service"
 )
 
+const managedServiceArg = "-managed-service"
+
 func cmdAgent(g *globals, args []string) error {
+	// The installed service puts this internal marker first. Consume it before
+	// registering user-facing flags so it remains in the process command line
+	// for package upgrades without appearing in help.
+	if len(args) > 0 && args[0] == managedServiceArg {
+		args = args[1:]
+	}
 	fs := newFlagSet(g, "agent", "agent [-socket path] [-upstream path|none]")
 	socket := fs.String("socket", "", "socket to listen on (default: agent.socket in the config, or ~/.certssh/agent.sock)")
 	upstream := fs.String("upstream", "", "upstream agent socket, or none (default: agent.upstream, or SSH_AUTH_SOCK)")
@@ -103,7 +111,9 @@ func cmdAgentInstall(g *globals, args []string) error {
 	if g.configPath != "" {
 		argv = append(argv, "-config", g.configPath)
 	}
-	argv = append(argv, "agent")
+	// Package upgrades use this marker to restart only service-managed agents,
+	// without terminating a manually started foreground agent.
+	argv = append(argv, "agent", managedServiceArg)
 	svc, err := service.For(argv, socket, config.StateDir())
 	if err != nil {
 		return err

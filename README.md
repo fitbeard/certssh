@@ -87,8 +87,14 @@ certificates only. Hosts it does not recognise see your own keys first.
 
 ## Install
 
-Download a release from
-[GitHub](https://github.com/vexxhost/certssh/releases), or:
+On macOS or Linux, install with Homebrew:
+
+```sh
+brew install --cask vexxhost/tap/certssh
+```
+
+Alternatively, download a release from
+[GitHub](https://github.com/vexxhost/certssh/releases), or install with Go:
 
 ```sh
 go install github.com/vexxhost/certssh/cmd/certssh@latest
@@ -104,7 +110,16 @@ echo 'export SSH_AUTH_SOCK=~/.certssh/agent.sock' >> ~/.zshrc   # or ~/.bashrc
 
 `certssh agent install` remembers the agent `SSH_AUTH_SOCK` pointed at before
 (on Linux) so its keys stay available. On macOS the system agent is found
-automatically.
+automatically. Homebrew upgrades restart an agent installed this way so it
+immediately runs the new binary.
+
+If you installed the managed agent, remove its user service before uninstalling
+the Homebrew cask:
+
+```sh
+certssh agent uninstall
+brew uninstall --cask certssh
+```
 
 ### Nix
 
