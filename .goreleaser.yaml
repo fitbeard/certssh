@@ -13,3 +13,26 @@ checksum:
   name_template: checksums.txt
 changelog:
   use: github-native
+homebrew_casks:
+  - name: certssh
+    commit_author:
+      name: github-actions[bot]
+      email: 41898282+github-actions[bot]@users.noreply.github.com
+    commit_msg_template: "Brew cask update for {{ .ProjectName }} version {{ .Tag }}"
+    homepage: https://github.com/vexxhost/certssh
+    description: SSH agent that signs certificates from OpenBao or Vault on demand
+    skip_upload: auto
+    hooks:
+      post:
+        install_steps: |
+          on_macos do
+            run "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "{{ .StagedPath }}/certssh"]
+          end
+          # launchd KeepAlive and systemd Restart=always relaunch the managed
+          # agent with the new binary. No matching process is not an error.
+          terminate_process "[/]certssh( .*)? agent -managed-service$", match: :full, must_succeed: false
+    repository:
+      owner: vexxhost
+      name: homebrew-tap
+      branch: main
+      token: "{{ .Env.HOMEBREW_GITHUB_API_TOKEN }}"
